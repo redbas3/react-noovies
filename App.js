@@ -1,33 +1,41 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import * as SplashScreen from 'expo-splash-screen';
-import * as Font from 'expo-font';
-import Entypo from '@expo/vector-icons/Entypo';
-import { Ionicons } from '@expo/vector-icons';
-import { Text, View, Image } from 'react-native';
-import { Asset } from 'expo-asset';
-import { Image } from 'expo-image';
+import React, { useCallback, useEffect, useState } from "react";
+import * as SplashScreen from "expo-splash-screen";
+import * as Font from "expo-font";
+import Entypo from "@expo/vector-icons/Entypo";
+import { Ionicons } from "@expo/vector-icons";
+import { Asset } from "expo-asset";
+import { NavigationContainer } from "@react-navigation/native";
+import Tabs from "./navigation/Tabs";
+import Root from "./navigation/Root";
+import { darkTheme, lightTheme } from "./styled";
+import { ThemeProvider } from "styled-components/native";
+import { Image, useColorScheme } from "react-native";
 
-const loadFonts = (fonts) => fonts.map(font => Font.loadAsync(font));
-const loadImages = (images) => images.map(image => {
-  if (typeof image === "string") {
-    return Image.prefetch(image);
-  }
-  else {
-    return Asset.loadAsync(image)
-  }
-});
+const loadFonts = (fonts) => fonts.map((font) => Font.loadAsync(font));
+const loadImages = (images) =>
+  images.map((image) => {
+    if (typeof image === "string") {
+      return Image.prefetch(image);
+    } else {
+      return Asset.loadAsync(image);
+    }
+  });
 
 export default function App() {
   const [appIsReady, setAppIsReady] = useState(false);
+  const isDark = useColorScheme() === "dark";
 
   useEffect(() => {
     async function prepare() {
       try {
         const fonts = loadFonts([Ionicons.font, Entypo.font]);
-        // await Font.loadAsync(Entypo.font); 
+        // await Font.loadAsync(Entypo.font);
         // await Font.loadAsync(Ionicons.font);
 
-        const images = loadImages([require('./1600x800_1.jpeg'), "https://reactnative.dev/docs/assets/GettingStartedCongratulations.png"]);
+        const images = loadImages([
+          require("./1600x800_1.jpeg"),
+          "https://reactnative.dev/docs/assets/GettingStartedCongratulations.png",
+        ]);
         // await Asset.loadAsync(require('./1600x800_1.jpeg'));
         // await Image.prefetch("https://reactnative.dev/docs/assets/GettingStartedCongratulations.png")
 
@@ -63,12 +71,10 @@ export default function App() {
   }
 
   return (
-    <View
-      style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-      onLayout={onLayoutRootView}>
-      <Text>We are done loading!</Text>
-      <Entypo name="rocket" size={30} />
-      <Image source={"./1600x800_1.jpeg"}></Image>
-    </View>
+    <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
+      <NavigationContainer onLayout={onLayoutRootView}>
+        <Root />
+      </NavigationContainer>
+    </ThemeProvider>
   );
 }
