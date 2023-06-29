@@ -10,6 +10,9 @@ import Root from "./navigation/Root";
 import { darkTheme, lightTheme } from "./styled";
 import { ThemeProvider } from "styled-components/native";
 import { Image, useColorScheme } from "react-native";
+import { QueryClient, QueryClientProvider } from "react-query";
+
+const queryClient = new QueryClient();
 
 const loadFonts = (fonts) => fonts.map((font) => Font.loadAsync(font));
 const loadImages = (images) =>
@@ -71,10 +74,12 @@ export default function App() {
   }
 
   return (
-    <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
-      <NavigationContainer onLayout={onLayoutRootView}>
-        <Root />
-      </NavigationContainer>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
+        <NavigationContainer onLayout={onLayoutRootView}>
+          <Root />
+        </NavigationContainer>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }

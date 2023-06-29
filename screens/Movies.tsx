@@ -1,132 +1,123 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import React, { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  Dimensions,
-  StyleSheet,
-  useColorScheme,
-} from "react-native";
+import { Dimensions, FlatList } from "react-native";
 import styled from "styled-components/native";
 import Swiper from "react-native-swiper";
-import { makeImgPath } from "../utils";
-import { BlurView } from "expo-blur";
+import Slide from "../components/Slide";
+import HMedia from "../components/HMedia";
+import VMedia from "../components/VMedia";
+import { useQuery } from "react-query";
+import { Movie, MovieResponse, moviesApi } from "../api";
+import { useQueryClient } from "react-query";
+import Loader from "../components/Loader";
+import HList from "../components/HList";
+import { useState } from "react";
 
-const API_KEY = "0982b256ea73339e86ad4ea71063ef1f";
-
-const Container = styled.ScrollView``;
-
-const View = styled.View`
-  flex: 1;
-`;
-
-const Loader = styled.View`
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-`;
-
-const BgImg = styled.Image``;
-
-const Wrapper = styled.View`
-  flex-direction: row;
-  height: 100%;
-  justify-content: center;
-  align-items: center;
-`;
-
-const Poster = styled.Image`
-  width: 100px;
-  height: 160px;
-  border-radius: 5px;
-`;
-
-const Column = styled.View`
-  width: 40%;
-  margin-left: 15px;
-`;
-
-const Title = styled.Text<{ isDark: boolean }>`
-  font-size: 16px;
+const ListTitle = styled.Text`
+  color: white;
+  font-size: 18px;
   font-weight: 600;
-  color: ${(props) => (props.isDark ? "white" : props.theme.textColor)};
+  margin-left: 30px;
 `;
 
-const Overview = styled.Text<{ isDark: boolean }>`
-  margin-top: 10px;
-  color: ${(props) =>
-    props.isDark ? "rgba(255, 255, 255, 0.8)" : "rgba(0, 0, 0, 0.8)"};
+const TrendingScroll = styled.FlatList`
+  margin-top: 20px;
+` as unknown as typeof FlatList;
+
+const ListContainer = styled.View`
+  margin-bottom: 40px;
 `;
 
-const Votes = styled(Overview)`
-  margin-top: 5px;
-  font-size: 12px;
+const ComingSoonTitle = styled(ListTitle)`
+  margin-bottom: 20px;
+`;
+
+const VSeparator = styled.View`
+  width: 30px;
+`;
+const HSeparator = styled.View`
+  height: 30px;
 `;
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 const Movies: React.FC<NativeStackScreenProps<any, "Movies">> = () => {
-  const isDark = useColorScheme() === "dark";
-  const [loading, setLoading] = useState(true);
-  const [nowPlayingMovies, setNowPlayingMovies] = useState([]);
-  const getNowPlaying = async () => {
-    const response = await fetch(
-      `https://api.themoviedb.org/3/movie/now_playing?language=en-US&page=1&region=KR&api_key=${API_KEY}`
-    );
-    const { results } = await response.json();
-    setNowPlayingMovies(results);
-    setLoading(false);
+  const queryClient = useQueryClient();
+  const [refreshing, setRefreshing] = useState(false);
+  const { isLoading: nowPlayingLoading, data: nowPlayingData } =
+    useQuery<MovieResponse>(["movies", "nowPlaying"], moviesApi.nowPlaying);
+  const { isLoading: upcomingLoading, data: upcomingData } =
+    useQuery<MovieResponse>(["movies", "upcoming"], moviesApi.upcoming);
+  const { isLoading: trendingLoading, data: trendingData } =
+    useQuery<MovieResponse>(["movies", "trending"], moviesApi.trending);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    queryClient.refetchQueries(["movies"]);
+    setRefreshing(false);
   };
-  useEffect(() => {
-    getNowPlaying();
-  }, []);
-  return loading ? (
-    <Loader>
-      <ActivityIndicator size="small"></ActivityIndicator>
-    </Loader>
-  ) : (
-    <Container>
-      <Swiper
-        horizontal
-        loop
-        autoplay
-        autoplayTimeout={3.5}
-        showsButtons={false}
-        showsPagination={false}
-        containerStyle={{ width: "100%", height: SCREEN_HEIGHT / 3 }}
-      >
-        {nowPlayingMovies.map((movie) => (
-          <View key={movie.id}>
-            <BgImg
-              source={{ uri: makeImgPath(movie.backdrop_path) }}
-              style={StyleSheet.absoluteFill}
-            ></BgImg>
-            <BlurView
-              intensity={85}
-              tint={isDark ? "dark" : "light"}
-              style={StyleSheet.absoluteFill}
-            >
-              <Wrapper>
-                <Poster
-                  source={{ uri: makeImgPath(movie.poster_path) }}
-                ></Poster>
-                <Column>
-                  <Title isDark={isDark}>{movie.original_title}</Title>
-                  {movie.vote_average > 0 ? (
-                    <Votes isDark={isDark}>⭐ {movie.vote_average}/10</Votes>
-                  ) : null}
-                  <Overview isDark={isDark}>
-                    {movie.overview.length > 80
-                      ? movie.overview.slice(0, 80) + "..."
-                      : movie.overview}
-                  </Overview>
-                </Column>
-              </Wrapper>
-            </BlurView>
-          </View>
-        ))}
-      </Swiper>
-    </Container>
+  const renderHMedia = ({ item }: { item: Movie }) => (
+    <HMedia
+      poster_path={item.poster_path || ""}
+      original_title={item.original_title}
+      release_date={item.release_date}
+      overview={item.overview}
+      vote_average={item.vote_average}
+    ></HMedia>
   );
+  const movieKeyExtractor = (item: Movie) => item.id + "";
+
+  const loading = nowPlayingLoading || upcomingLoading || trendingLoading;
+
+  // get objets types
+  // console.log(Object.keys(nowPlayingData?.results[0]));
+  // console.log(Object.keys(nowPlayingData?.results[0]).map((v) => typeof v));
+
+  return loading ? (
+    <Loader />
+  ) : upcomingData ? (
+    <FlatList
+      refreshing={refreshing}
+      onRefresh={onRefresh}
+      data={upcomingData.results}
+      ItemSeparatorComponent={HSeparator}
+      keyExtractor={movieKeyExtractor}
+      renderItem={renderHMedia}
+      ListHeaderComponent={() => {
+        return (
+          <>
+            <Swiper
+              horizontal
+              loop
+              autoplay
+              autoplayTimeout={3.5}
+              showsButtons={false}
+              showsPagination={false}
+              containerStyle={{
+                width: "100%",
+                height: SCREEN_HEIGHT / 4,
+                marginBottom: 30,
+              }}
+            >
+              {nowPlayingData?.results.map((movie) => (
+                <Slide
+                  key={movie.id}
+                  backdropPath={movie.backdrop_path || ""}
+                  posterPath={movie.poster_path || ""}
+                  originalTitle={movie.original_title}
+                  voteAverage={movie.vote_average}
+                  overview={movie.overview}
+                ></Slide>
+              ))}
+            </Swiper>
+            {trendingData ? (
+              <HList title="Trending Movies" data={trendingData.results} />
+            ) : null}
+            <ComingSoonTitle>Coming Soon</ComingSoonTitle>
+          </>
+        );
+      }}
+    ></FlatList>
+  ) : null;
 };
 
 export default Movies;
