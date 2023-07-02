@@ -4,8 +4,7 @@ import styled from "styled-components/native";
 import Swiper from "react-native-swiper";
 import Slide from "../components/Slide";
 import HMedia from "../components/HMedia";
-import VMedia from "../components/VMedia";
-import { useQuery } from "react-query";
+import { useInfiniteQuery, useQuery } from "react-query";
 import { Movie, MovieResponse, moviesApi } from "../api";
 import { useQueryClient } from "react-query";
 import Loader from "../components/Loader";
@@ -40,16 +39,30 @@ const HSeparator = styled.View`
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
-const Movies: React.FC<NativeStackScreenProps<any, "Movies">> = () => {
+const Movies: React.FC = () => {
   const queryClient = useQueryClient();
   const [refreshing, setRefreshing] = useState(false);
   const { isLoading: nowPlayingLoading, data: nowPlayingData } =
     useQuery<MovieResponse>(["movies", "nowPlaying"], moviesApi.nowPlaying);
-  const { isLoading: upcomingLoading, data: upcomingData } =
-    useQuery<MovieResponse>(["movies", "upcoming"], moviesApi.upcoming);
+  const {
+    isLoading: upcomingLoading,
+    data: upcomingData,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery<MovieResponse>(
+    ["movies", "upcoming"],
+    moviesApi.upcoming,
+    {
+      getNextPageParam: (currentPage) => {
+        const nextPage = currentPage.page + 1;
+        return nextPage > currentPage.total_pages ? null : nextPage;
+      },
+    }
+  );
   const { isLoading: trendingLoading, data: trendingData } =
     useQuery<MovieResponse>(["movies", "trending"], moviesApi.trending);
 
+  console.log(upcomingData);
   const onRefresh = async () => {
     setRefreshing(true);
     queryClient.refetchQueries(["movies"]);
@@ -62,6 +75,7 @@ const Movies: React.FC<NativeStackScreenProps<any, "Movies">> = () => {
       release_date={item.release_date}
       overview={item.overview}
       vote_average={item.vote_average}
+      fullData={item}
     ></HMedia>
   );
   const movieKeyExtractor = (item: Movie) => item.id + "";
@@ -72,15 +86,23 @@ const Movies: React.FC<NativeStackScreenProps<any, "Movies">> = () => {
   // console.log(Object.keys(nowPlayingData?.results[0]));
   // console.log(Object.keys(nowPlayingData?.results[0]).map((v) => typeof v));
 
+  const loadMore = () => {
+    if (hasNextPage) {
+      fetchNextPage();
+    }
+  };
   return loading ? (
     <Loader />
   ) : upcomingData ? (
     <FlatList
+      onEndReached={loadMore}
+      onEndReachedThreshold={0.4}
       refreshing={refreshing}
       onRefresh={onRefresh}
-      data={upcomingData.results}
+      data={upcomingData.pages.map((page) => page.results).flat()}
       ItemSeparatorComponent={HSeparator}
-      keyExtractor={movieKeyExtractor}
+      // keyExtractor={movieKeyExtractor}
+      keyExtractor={(item) => item.id + ""}
       renderItem={renderHMedia}
       ListHeaderComponent={() => {
         return (
@@ -101,11 +123,12 @@ const Movies: React.FC<NativeStackScreenProps<any, "Movies">> = () => {
               {nowPlayingData?.results.map((movie) => (
                 <Slide
                   key={movie.id}
-                  backdropPath={movie.backdrop_path || ""}
-                  posterPath={movie.poster_path || ""}
-                  originalTitle={movie.original_title}
-                  voteAverage={movie.vote_average}
+                  backdrop_path={movie.backdrop_path || ""}
+                  poster_path={movie.poster_path || ""}
+                  original_title={movie.original_title}
+                  vote_average={movie.vote_average}
                   overview={movie.overview}
+                  fullData={movie}
                 ></Slide>
               ))}
             </Swiper>

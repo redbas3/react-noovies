@@ -21,10 +21,14 @@ PODS:
     - SDWebImageWebPCoder (~> 0.9.1)
   - ExpoKeepAwake (12.0.1):
     - ExpoModulesCore
+  - ExpoLinearGradient (12.1.2):
+    - ExpoModulesCore
   - ExpoModulesCore (1.2.7):
     - React-Core
     - React-RCTAppDelegate
     - ReactCommon/turbomodule/core
+  - ExpoWebBrowser (12.1.1):
+    - ExpoModulesCore
   - EXSplashScreen (0.18.2):
     - ExpoModulesCore
     - React-Core
@@ -430,7 +434,9 @@ DEPENDENCIES:
   - ExpoBlur (from `../node_modules/expo-blur/ios`)
   - ExpoImage (from `../node_modules/expo-image/ios`)
   - ExpoKeepAwake (from `../node_modules/expo-keep-awake/ios`)
+  - ExpoLinearGradient (from `../node_modules/expo-linear-gradient/ios`)
   - ExpoModulesCore (from `../node_modules/expo-modules-core`)
+  - ExpoWebBrowser (from `../node_modules/expo-web-browser/ios`)
   - EXSplashScreen (from `../node_modules/expo-splash-screen/ios`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../node_modules/react-native/React/FBReactNativeSpec`)
@@ -504,8 +510,12 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-image/ios"
   ExpoKeepAwake:
     :path: "../node_modules/expo-keep-awake/ios"
+  ExpoLinearGradient:
+    :path: "../node_modules/expo-linear-gradient/ios"
   ExpoModulesCore:
     :path: "../node_modules/expo-modules-core"
+  ExpoWebBrowser:
+    :path: "../node_modules/expo-web-browser/ios"
   EXSplashScreen:
     :path: "../node_modules/expo-splash-screen/ios"
   FBLazyVector:
@@ -590,7 +600,9 @@ SPEC CHECKSUMS:
   ExpoBlur: fac3c6318fdf409dd5740afd3313b2bd52a35bac
   ExpoImage: 55b537a1f50df2f6fc3c2d82552e6d1df397a73d
   ExpoKeepAwake: 69f5f627670d62318410392d03e0b5db0f85759a
+  ExpoLinearGradient: 8eaab76b7f55c612ed8348c8be8c2a18a9b4529f
   ExpoModulesCore: 653958063a301098b541ae4dfed1ac0b98db607b
+  ExpoWebBrowser: 033d34c478d9986da2f1679729041423837626e0
   EXSplashScreen: 0e0a9ba0cf7553094e93213099bd7b42e6e237e9
   FBLazyVector: f637f31eacba90d4fdeff3fa41608b8f361c173b
   FBReactNativeSpec: 0d9a4f4de7ab614c49e98c00aedfd3bfbda33d59

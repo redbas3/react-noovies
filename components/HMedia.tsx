@@ -2,6 +2,9 @@ import React from "react";
 import styled from "styled-components/native";
 import Poster from "./Poster";
 import Votes from "./Votes";
+import { useNavigation } from "@react-navigation/native";
+import { TouchableOpacity } from "react-native";
+import { Movie } from "../api";
 
 const HMovie = styled.View`
   padding: 0px 30px;
@@ -39,6 +42,7 @@ interface HMediaProps {
   release_date?: string;
   overview: string;
   vote_average?: number;
+  fullData: Movie;
 }
 
 const HMedia: React.FC<HMediaProps> = ({
@@ -47,29 +51,42 @@ const HMedia: React.FC<HMediaProps> = ({
   release_date,
   overview,
   vote_average,
+  fullData,
 }) => {
+  const navigation = useNavigation();
+  const goToDetail = () => {
+    //@ts-ignore
+    navigation.navigate("Stack", {
+      screen: "Detail",
+      params: {
+        ...fullData,
+      },
+    });
+  };
   return (
-    <HMovie>
-      <Poster path={poster_path} />
-      <HColumn>
-        <Title>{original_title}</Title>
-        {release_date ? (
-          <Release>
-            {new Date(release_date).toLocaleDateString("ko", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </Release>
-        ) : null}
-        <Overview>
-          {overview !== "" && overview.length > 100
-            ? overview.slice(0, 100) + "..."
-            : null}
-        </Overview>
-        {vote_average ? <Votes vote_average={vote_average}></Votes> : null}
-      </HColumn>
-    </HMovie>
+    <TouchableOpacity onPress={goToDetail}>
+      <HMovie>
+        <Poster path={poster_path} />
+        <HColumn>
+          <Title>{original_title}</Title>
+          {release_date ? (
+            <Release>
+              {new Date(release_date).toLocaleDateString("ko", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </Release>
+          ) : null}
+          <Overview>
+            {overview !== "" && overview.length > 100
+              ? overview.slice(0, 100) + "..."
+              : null}
+          </Overview>
+          {vote_average ? <Votes vote_average={vote_average}></Votes> : null}
+        </HColumn>
+      </HMovie>
+    </TouchableOpacity>
   );
 };
 

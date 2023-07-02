@@ -1,8 +1,8 @@
-import React, { Children } from "react";
+import React from "react";
 import styled from "styled-components/native";
 import { FlatList } from "react-native";
-import { TV } from "../api";
 import VMedia from "./VMedia";
+import { Movie, TV } from "../api";
 
 const ListContainer = styled.View`
   margin-bottom: 40px;
@@ -22,7 +22,7 @@ export const HListSeparator = styled.View`
 
 interface HListProps {
   title: string;
-  data: any[];
+  data: Movie[] | TV[];
 }
 
 const movieKeyExtractor = (item: any) => item.id + "";
@@ -32,6 +32,7 @@ const renderVMedia = ({ item }: { item: any }) => (
     poster_path={item.poster_path || ""}
     original_title={item.original_title ?? item.original_name}
     vote_average={item.vote_average}
+    fullData={item}
   ></VMedia>
 );
 
