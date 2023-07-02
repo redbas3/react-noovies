@@ -1,7 +1,16 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components/native";
-import { Movie, MovieResponse, TV, TVResponse, moviesApi, tvApi } from "../api";
+import {
+  Movie,
+  MovieDetails,
+  MovieResponse,
+  TV,
+  TVDetails,
+  TVResponse,
+  moviesApi,
+  tvApi,
+} from "../api";
 import Poster from "../components/Poster";
 import { makeImgPath } from "../utils";
 import {
@@ -70,7 +79,7 @@ const BtnText = styled.Text`
 `;
 
 type RootStackParamList = {
-  Detail: { fullData: Movie | TV };
+  Detail: Movie | TV;
 };
 
 type DetailScreenProps = NativeStackScreenProps<RootStackParamList, "Detail">;
@@ -80,26 +89,29 @@ const Detail: React.FC<DetailScreenProps> = ({
   route: { params },
 }) => {
   const isMovie = "original_title" in params;
-  const { isLoading, data } = useQuery<MovieResponse, TVResponse>(
+  const { isLoading, data } = useQuery<MovieDetails | TVDetails>(
     [isMovie ? "movies" : "tv", params.id],
     isMovie ? moviesApi.detail : tvApi.detail
   );
 
   const shareMedia = async () => {
-    const isAndroid = Platform.OS === "android";
-    const homepage = isMovie
-      ? `https://www.imdb.com/title/${data.imdb_id}/`
-      : data.homepage;
-    if (isAndroid) {
-      await Share.share({
-        message: `${params.overview}\nCheck it out: ${homepage}`,
-        title: isMovie ? params.original_title : params.original_name,
-      });
-    } else {
-      await Share.share({
-        url: homepage,
-        title: isMovie ? params.original_title : params.original_name,
-      });
+    if (data) {
+      const isAndroid = Platform.OS === "android";
+      const homepage =
+        isMovie && "imdb_id" in data
+          ? `https://www.imdb.com/title/${data.imdb_id}/`
+          : data.homepage;
+      if (isAndroid) {
+        await Share.share({
+          message: `${params.overview}\nCheck it out: ${homepage}`,
+          title: isMovie ? params.original_title : params.original_name,
+        });
+      } else {
+        await Share.share({
+          url: homepage,
+          title: isMovie ? params.original_title : params.original_name,
+        });
+      }
     }
   };
   const ShareButton = () => (
@@ -148,7 +160,7 @@ const Detail: React.FC<DetailScreenProps> = ({
           style={StyleSheet.absoluteFill}
         />
         <Column>
-          <Poster path={makeImgPath(params.poster_path)} />
+          <Poster path={makeImgPath(params.poster_path || "")} />
           <Title>
             {isMovie ? params.original_title : params.original_name}
           </Title>
