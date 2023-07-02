@@ -3,15 +3,15 @@ import styled from "styled-components/native";
 import Poster from "./Poster";
 import Votes from "./Votes";
 import { useNavigation } from "@react-navigation/native";
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, useColorScheme } from "react-native";
 import { Movie, TV } from "../api";
 
 const Container = styled.View`
   align-items: center;
 `;
 
-const Title = styled.Text`
-  color: white;
+const Title = styled.Text<{ isDark: boolean }>`
+  color: ${(props) => (props.isDark ? "white" : props.theme.textColor)};
   font-weight: 600;
   margin-top: 7px;
   margin-bottom: 5px;
@@ -30,6 +30,7 @@ const VMedia: React.FC<VMedia> = ({
   vote_average,
   fullData,
 }) => {
+  const isDark = useColorScheme() === "dark";
   const navigation = useNavigation();
   const goToDetail = () => {
     //@ts-ignore
@@ -44,7 +45,7 @@ const VMedia: React.FC<VMedia> = ({
     <TouchableOpacity onPress={goToDetail}>
       <Container>
         <Poster path={poster_path} />
-        <Title>
+        <Title isDark={isDark}>
           {original_title.length > 8
             ? original_title.slice(0, 8) + "..."
             : original_title}

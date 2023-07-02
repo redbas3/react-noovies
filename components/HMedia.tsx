@@ -3,7 +3,7 @@ import styled from "styled-components/native";
 import Poster from "./Poster";
 import Votes from "./Votes";
 import { useNavigation } from "@react-navigation/native";
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, useColorScheme } from "react-native";
 import { Movie } from "../api";
 
 const HMovie = styled.View`
@@ -16,22 +16,22 @@ const HColumn = styled.View`
   width: 80%;
 `;
 
-const Title = styled.Text`
-  color: white;
+const Title = styled.Text<{ isDark: boolean }>`
+  color: ${(props) => (props.isDark ? "white" : props.theme.textColor)};
   font-weight: 600;
   margin-top: 7px;
   margin-bottom: 5px;
 `;
 
-const Overview = styled.Text`
-  color: white;
+const Overview = styled.Text<{ isDark: boolean }>`
+  color: ${(props) => (props.isDark ? "white" : props.theme.textColor)};
   opacity: 0.8;
   width: 80%;
   margin-bottom: 10px;
 `;
 
-const Release = styled.Text`
-  color: white;
+const Release = styled.Text<{ isDark: boolean }>`
+  color: ${(props) => (props.isDark ? "white" : props.theme.textColor)};
   font-size: 12px;
   margin-bottom: 10px;
 `;
@@ -53,6 +53,7 @@ const HMedia: React.FC<HMediaProps> = ({
   vote_average,
   fullData,
 }) => {
+  const isDark = useColorScheme() === "dark";
   const navigation = useNavigation();
   const goToDetail = () => {
     //@ts-ignore
@@ -68,9 +69,9 @@ const HMedia: React.FC<HMediaProps> = ({
       <HMovie>
         <Poster path={poster_path} />
         <HColumn>
-          <Title>{original_title}</Title>
+          <Title isDark={isDark}>{original_title}</Title>
           {release_date ? (
-            <Release>
+            <Release isDark={isDark}>
               {new Date(release_date).toLocaleDateString("ko", {
                 year: "numeric",
                 month: "long",
@@ -78,7 +79,7 @@ const HMedia: React.FC<HMediaProps> = ({
               })}
             </Release>
           ) : null}
-          <Overview>
+          <Overview isDark={isDark}>
             {overview !== "" && overview.length > 100
               ? overview.slice(0, 100) + "..."
               : null}

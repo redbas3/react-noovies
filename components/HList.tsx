@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components/native";
-import { FlatList } from "react-native";
+import { FlatList, useColorScheme } from "react-native";
 import VMedia from "./VMedia";
 import { Movie, TV } from "../api";
 
@@ -8,8 +8,8 @@ const ListContainer = styled.View`
   margin-bottom: 40px;
 `;
 
-const ListTitle = styled.Text`
-  color: white;
+const ListTitle = styled.Text<{ isDark: boolean }>`
+  color: ${(props) => (props.isDark ? "white" : props.theme.textColor)};
   font-size: 18px;
   font-weight: 600;
   margin-left: 30px;
@@ -37,9 +37,10 @@ const renderVMedia = ({ item }: { item: any }) => (
 );
 
 const HList: React.FC<HListProps> = ({ title, data }) => {
+  const isDark = useColorScheme() === "dark";
   return (
     <ListContainer>
-      <ListTitle>{title}</ListTitle>
+      <ListTitle isDark={isDark}>{title}</ListTitle>
       <FlatList
         data={data}
         horizontal

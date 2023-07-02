@@ -20,9 +20,10 @@ import {
   Share,
   TouchableOpacity,
   Platform,
+  useColorScheme,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { BLACK_COLOR } from "../colors";
+import { BLACK_COLOR, LIGHT_GREY } from "../colors";
 import { useQuery } from "react-query";
 import Loader from "../components/Loader";
 import { Ionicons } from "@expo/vector-icons";
@@ -47,8 +48,8 @@ const Column = styled.View`
   width: 80%;
 `;
 
-const Title = styled.Text`
-  color: white;
+const Title = styled.Text<{ isDark: boolean }>`
+  color: ${(props) => (props.isDark ? props.theme.textColor : "white")};
   font-size: 28px;
   font-weight: 500;
   align-self: flex-end;
@@ -70,8 +71,8 @@ const VideoBtn = styled.TouchableOpacity`
   width: 95%;
 `;
 
-const BtnText = styled.Text`
-  color: white;
+const BtnText = styled.Text<{ isDark: boolean }>`
+  color: ${(props) => (props.isDark ? "white" : props.theme.textColor)};
   font-weight: 600;
   margin-bottom: 10px;
   line-height: 20px;
@@ -88,6 +89,7 @@ const Detail: React.FC<DetailScreenProps> = ({
   navigation: { setOptions, goBack },
   route: { params },
 }) => {
+  const isDark = useColorScheme() === "dark";
   const isMovie = "original_title" in params;
   const { isLoading, data } = useQuery<MovieDetails | TVDetails>(
     [isMovie ? "movies" : "tv", params.id],
@@ -116,13 +118,21 @@ const Detail: React.FC<DetailScreenProps> = ({
   };
   const ShareButton = () => (
     <TouchableOpacity onPress={shareMedia}>
-      <Ionicons name="share-outline" color="white" size={20} />
+      <Ionicons
+        name="share-outline"
+        color={isDark ? "white" : BLACK_COLOR}
+        size={20}
+      />
     </TouchableOpacity>
   );
   const BackButton = () => {
     return (
       <TouchableOpacity onPress={goBack}>
-        <Ionicons name="arrow-back" color="white" size={20} />
+        <Ionicons
+          name="arrow-back"
+          color={isDark ? "white" : BLACK_COLOR}
+          size={20}
+        />
       </TouchableOpacity>
     );
   };
@@ -156,12 +166,14 @@ const Detail: React.FC<DetailScreenProps> = ({
         />
         <LinearGradient
           // Background Linear Gradient
-          colors={["transparent", BLACK_COLOR]}
+          colors={
+            isDark ? ["transparent", BLACK_COLOR] : ["transparent", LIGHT_GREY]
+          }
           style={StyleSheet.absoluteFill}
         />
         <Column>
           <Poster path={makeImgPath(params.poster_path || "")} />
-          <Title>
+          <Title isDark={isDark}>
             {isMovie ? params.original_title : params.original_name}
           </Title>
         </Column>
@@ -171,8 +183,12 @@ const Detail: React.FC<DetailScreenProps> = ({
         {isLoading ? <Loader /> : null}
         {data?.videos?.results.map((video: any) => (
           <VideoBtn key={video.id} onPress={() => openYTLink(video.key)}>
-            <Ionicons name="logo-youtube" color="white" size={20} />
-            <BtnText>{video.name}</BtnText>
+            <Ionicons
+              name="logo-youtube"
+              color={isDark ? "white" : BLACK_COLOR}
+              size={20}
+            />
+            <BtnText isDark={isDark}>{video.name}</BtnText>
           </VideoBtn>
         ))}
       </Data>

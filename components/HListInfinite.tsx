@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components/native";
-import { FlatList } from "react-native";
+import { FlatList, useColorScheme } from "react-native";
 import VMedia from "./VMedia";
 import { Movie, TV } from "../api";
 import { fetchMore, FetchNext } from "../utils";
@@ -9,8 +9,8 @@ const ListContainer = styled.View`
   margin-bottom: 40px;
 `;
 
-const ListTitle = styled.Text`
-  color: white;
+const ListTitle = styled.Text<{ isDark: boolean }>`
+  color: ${(props) => (props.isDark ? "white" : props.theme.textColor)};
   font-size: 18px;
   font-weight: 600;
   margin-left: 30px;
@@ -45,9 +45,10 @@ const HListInfinite: React.FC<HListProps> = ({
   hasNext,
   fetchNext,
 }) => {
+  const isDark = useColorScheme() === "dark";
   return (
     <ListContainer>
-      <ListTitle>{title}</ListTitle>
+      <ListTitle isDark={isDark}>{title}</ListTitle>
       <FlatList
         onEndReached={() => fetchMore(hasNext, fetchNext)}
         onEndReachedThreshold={0.3}

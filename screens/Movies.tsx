@@ -1,5 +1,5 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Dimensions, FlatList } from "react-native";
+import { Dimensions, FlatList, useColorScheme } from "react-native";
 import styled from "styled-components/native";
 import Swiper from "react-native-swiper";
 import Slide from "../components/Slide";
@@ -13,8 +13,8 @@ import HListInfinite from "../components/HListInfinite";
 import { useState } from "react";
 import { fetchMore } from "../utils";
 
-const ListTitle = styled.Text`
-  color: white;
+const ListTitle = styled.Text<{ isDark: boolean }>`
+  color: ${(props) => (props.isDark ? "white" : props.theme.textColor)};
   font-size: 18px;
   font-weight: 600;
   margin-left: 30px;
@@ -42,6 +42,7 @@ const HSeparator = styled.View`
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 const Movies: React.FC = () => {
+  const isDark = useColorScheme() === "dark";
   const queryClient = useQueryClient();
   const [refreshing, setRefreshing] = useState(false);
   const { isLoading: nowPlayingLoading, data: nowPlayingData } =
@@ -76,8 +77,6 @@ const Movies: React.FC = () => {
       },
     }
   );
-
-  console.log(trendingData);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -151,7 +150,7 @@ const Movies: React.FC = () => {
                 data={trendingData.pages.map((page) => page.results).flat()}
               />
             ) : null}
-            <ComingSoonTitle>Coming Soon</ComingSoonTitle>
+            <ComingSoonTitle isDark={isDark}>Coming Soon</ComingSoonTitle>
           </>
         );
       }}
