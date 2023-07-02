@@ -3,6 +3,7 @@ import styled from "styled-components/native";
 import { FlatList } from "react-native";
 import VMedia from "./VMedia";
 import { Movie, TV } from "../api";
+import { fetchMore, FetchNext } from "../utils";
 
 const ListContainer = styled.View`
   margin-bottom: 40px;
@@ -23,8 +24,8 @@ export const HListSeparator = styled.View`
 interface HListProps {
   title: string;
   data: Movie[] | TV[];
-  hasNextPage?: boolean;
-  fetchNextPage: () => {};
+  hasNext: boolean | undefined;
+  fetchNext: FetchNext;
 }
 
 const movieKeyExtractor = (item: any) => item.id + "";
@@ -41,21 +42,15 @@ const renderVMedia = ({ item }: { item: any }) => (
 const HListInfinite: React.FC<HListProps> = ({
   title,
   data,
-  hasNextPage,
-  fetchNextPage,
+  hasNext,
+  fetchNext,
 }) => {
-  const loadMore = () => {
-    if (hasNextPage) {
-      fetchNextPage();
-    }
-  };
-
   return (
     <ListContainer>
       <ListTitle>{title}</ListTitle>
       <FlatList
-        onEndReached={loadMore}
-        onEndReachedThreshold={0.4}
+        onEndReached={() => fetchMore(hasNext, fetchNext)}
+        onEndReachedThreshold={0.3}
         data={data}
         horizontal
         showsHorizontalScrollIndicator={false}

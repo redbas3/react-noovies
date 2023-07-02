@@ -11,6 +11,7 @@ import Loader from "../components/Loader";
 import HList from "../components/HList";
 import HListInfinite from "../components/HListInfinite";
 import { useState } from "react";
+import { fetchMore } from "../utils";
 
 const ListTitle = styled.Text`
   color: white;
@@ -48,8 +49,8 @@ const Movies: React.FC = () => {
   const {
     isLoading: upcomingLoading,
     data: upcomingData,
-    hasNextPage,
-    fetchNextPage,
+    hasNextPage: upcomingHasNextPage,
+    fetchNextPage: upcomingFetchNextPage,
   } = useInfiniteQuery<MovieResponse>(
     ["movies", "upcoming"],
     moviesApi.upcoming,
@@ -101,17 +102,11 @@ const Movies: React.FC = () => {
   // console.log(Object.keys(nowPlayingData?.results[0]));
   // console.log(Object.keys(nowPlayingData?.results[0]).map((v) => typeof v));
 
-  const loadMore = () => {
-    if (hasNextPage) {
-      fetchNextPage();
-    }
-  };
-
   return loading ? (
     <Loader />
   ) : upcomingData ? (
     <FlatList
-      onEndReached={loadMore}
+      onEndReached={() => fetchMore(upcomingHasNextPage, upcomingFetchNextPage)}
       onEndReachedThreshold={0.4}
       refreshing={refreshing}
       onRefresh={onRefresh}
@@ -151,8 +146,8 @@ const Movies: React.FC = () => {
             {trendingData ? (
               <HListInfinite
                 title="Trending Movies"
-                hasNextPage={trendingHasNextPage}
-                fetchNextPage={trendingFetchNextPage}
+                hasNext={trendingHasNextPage}
+                fetchNext={trendingFetchNextPage}
                 data={trendingData.pages.map((page) => page.results).flat()}
               />
             ) : null}
