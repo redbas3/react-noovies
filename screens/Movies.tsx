@@ -9,6 +9,7 @@ import { Movie, MovieResponse, moviesApi } from "../api";
 import { useQueryClient } from "react-query";
 import Loader from "../components/Loader";
 import HList from "../components/HList";
+import HListInfinite from "../components/HListInfinite";
 import { useState } from "react";
 
 const ListTitle = styled.Text`
@@ -59,10 +60,24 @@ const Movies: React.FC = () => {
       },
     }
   );
-  const { isLoading: trendingLoading, data: trendingData } =
-    useQuery<MovieResponse>(["movies", "trending"], moviesApi.trending);
+  const {
+    isLoading: trendingLoading,
+    data: trendingData,
+    hasNextPage: trendingHasNextPage,
+    fetchNextPage: trendingFetchNextPage,
+  } = useInfiniteQuery<MovieResponse>(
+    ["movies", "trending"],
+    moviesApi.trending,
+    {
+      getNextPageParam: (currentPage) => {
+        const nextPage = currentPage.page + 1;
+        return nextPage > currentPage.total_pages ? null : nextPage;
+      },
+    }
+  );
 
-  console.log(upcomingData);
+  console.log(trendingData);
+
   const onRefresh = async () => {
     setRefreshing(true);
     queryClient.refetchQueries(["movies"]);
@@ -91,6 +106,7 @@ const Movies: React.FC = () => {
       fetchNextPage();
     }
   };
+
   return loading ? (
     <Loader />
   ) : upcomingData ? (
@@ -133,7 +149,12 @@ const Movies: React.FC = () => {
               ))}
             </Swiper>
             {trendingData ? (
-              <HList title="Trending Movies" data={trendingData.results} />
+              <HListInfinite
+                title="Trending Movies"
+                hasNextPage={trendingHasNextPage}
+                fetchNextPage={trendingFetchNextPage}
+                data={trendingData.pages.map((page) => page.results).flat()}
+              />
             ) : null}
             <ComingSoonTitle>Coming Soon</ComingSoonTitle>
           </>
