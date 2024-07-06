@@ -101,6 +101,7 @@ const Movies: React.FC = () => {
   // console.log(Object.keys(nowPlayingData?.results[0]));
   // console.log(Object.keys(nowPlayingData?.results[0]).map((v) => typeof v));
 
+  console.log(upcomingData);
   return loading ? (
     <Loader />
   ) : upcomingData ? (

@@ -126,13 +126,12 @@ interface BaseResponse {
 }
 
 export interface MovieResponse extends BaseResponse {
-  results: Movie[]
+  results: Movie[];
 }
 
 export interface TVResponse extends BaseResponse {
-  results: TV[]
+  results: TV[];
 }
-
 
 type MovieListResponse = QueryFunction<MovieResponse>;
 type TVListResponse = QueryFunction<TVResponse>;
@@ -153,32 +152,59 @@ interface TVFetchers {
   detail: QueryFunction<TVDetails>;
 }
 
-export const moviesApi:MovieFetchers = { 
-  trending: ({pageParam}) => fetch(`${BASE_URL}/trending/movie/week?api_key=${API_KEY}&page=${pageParam ?? 1}`).then((res) => res.json()),
-  upcoming: ({pageParam}) => fetch(`${BASE_URL}/movie/upcoming?page=${pageParam}&api_key=${API_KEY}`).then((res) => res.json()),
-  nowPlaying: () => 
-    fetch(`${BASE_URL}/movie/now_playing?language=ko-Kr&page=1&region=KR&api_key=${API_KEY}`).then((res) => res.json()),
-  
-  search: ({queryKey}:any) => {
-    const [_, query] = queryKey
-    return fetch(`${BASE_URL}/search/movie?language=ko-Kr&page=1&region=KR&api_key=${API_KEY}&query=${query}`).then((res) => res.json());
+export const moviesApi: MovieFetchers = {
+  trending: ({ pageParam }) =>
+    fetch(
+      `${BASE_URL}/trending/movie/week?api_key=${API_KEY}&page=${
+        pageParam ?? 1
+      }`
+    ).then((res) => res.json()),
+  upcoming: ({ pageParam }) =>
+    fetch(`${BASE_URL}/movie/upcoming?page=1&api_key=${API_KEY}`).then((res) =>
+      res.json()
+    ),
+  nowPlaying: () =>
+    fetch(
+      `${BASE_URL}/movie/now_playing?language=ko-Kr&page=1&region=KR&api_key=${API_KEY}`
+    ).then((res) => res.json()),
+
+  search: ({ queryKey }: any) => {
+    const [_, query] = queryKey;
+    return fetch(
+      `${BASE_URL}/search/movie?language=ko-Kr&page=1&region=KR&api_key=${API_KEY}&query=${query}`
+    ).then((res) => res.json());
   },
-  detail: ({queryKey}:any) => {
-    const [_, id] = queryKey
-    return fetch(`${BASE_URL}/movie/${id}?&api_key=${API_KEY}&append_to_response=videos,images`).then((res) => res.json());
+  detail: ({ queryKey }: any) => {
+    const [_, id] = queryKey;
+    return fetch(
+      `${BASE_URL}/movie/${id}?&api_key=${API_KEY}&append_to_response=videos,images`
+    ).then((res) => res.json());
   },
 };
 
-export const tvApi = { 
-  trending: () => fetch(`${BASE_URL}/trending/tv/week?api_key=${API_KEY}`).then((res) => res.json()),
-  airingToday: () => fetch(`${BASE_URL}/tv/airing_today?language=ko-Kr&page=1&region=KR&api_key=${API_KEY}`).then((res) => res.json()),
-  topRated: () => fetch(`${BASE_URL}/tv/top_rated?language=ko-Kr&page=1&region=KR&api_key=${API_KEY}`).then((res) => res.json()),
-  search: ({queryKey}:any) => {
-    const [_, query] = queryKey
-    return fetch(`${BASE_URL}/search/tv?language=ko-Kr&page=1&region=KR&api_key=${API_KEY}&query=${query}`).then((res) => res.json());
+export const tvApi = {
+  trending: () =>
+    fetch(`${BASE_URL}/trending/tv/week?api_key=${API_KEY}`).then((res) =>
+      res.json()
+    ),
+  airingToday: () =>
+    fetch(
+      `${BASE_URL}/tv/airing_today?language=ko-Kr&page=1&region=KR&api_key=${API_KEY}`
+    ).then((res) => res.json()),
+  topRated: () =>
+    fetch(
+      `${BASE_URL}/tv/top_rated?language=ko-Kr&page=1&region=KR&api_key=${API_KEY}`
+    ).then((res) => res.json()),
+  search: ({ queryKey }: any) => {
+    const [_, query] = queryKey;
+    return fetch(
+      `${BASE_URL}/search/tv?language=ko-Kr&page=1&region=KR&api_key=${API_KEY}&query=${query}`
+    ).then((res) => res.json());
   },
-  detail: ({queryKey}:any) => {
-    const [_, id] = queryKey
-    return fetch(`${BASE_URL}/tv/${id}?&api_key=${API_KEY}&append_to_response=videos,images`).then((res) => res.json());
+  detail: ({ queryKey }: any) => {
+    const [_, id] = queryKey;
+    return fetch(
+      `${BASE_URL}/tv/${id}?&api_key=${API_KEY}&append_to_response=videos,images`
+    ).then((res) => res.json());
   },
 };
