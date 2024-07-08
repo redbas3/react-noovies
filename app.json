@@ -3,13 +3,29 @@
     "name": "noovies",
     "slug": "noovies",
     "version": "1.0.0",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
     "plugins": [
       "expo-asset",
-      "expo-font"
-    ]
+      "expo-font",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 34,
+            "targetSdkVersion": 34,
+            "buildToolsVersion": "34.0.0"
+          },
+          "ios": {
+            "deploymentTarget": "13.4"
+          }
+        }
+      ]
+    ],
+    "jsEngine": "hermes",
+    "extra": {
+      "eas": {
+        "projectId": "7f23b6e4-d2ca-4ce6-83e3-e8bb50f0beb2"
+      }
+    }
   },
   "name": "noovies"
 }

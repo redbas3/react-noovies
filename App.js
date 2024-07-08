@@ -36,10 +36,10 @@ export default function App() {
         // await Font.loadAsync(Ionicons.font);
 
         const images = loadImages([
-          require("./1600x800_1.jpeg"),
+          require("./temp.jpeg"),
           "https://reactnative.dev/docs/assets/GettingStartedCongratulations.png",
         ]);
-        // await Asset.loadAsync(require('./1600x800_1.jpeg'));
+        // await Asset.loadAsync(require('./temp.jpeg'));
         // await Image.prefetch("https://reactnative.dev/docs/assets/GettingStartedCongratulations.png")
 
         await Promise.all([...fonts, ...images]);
